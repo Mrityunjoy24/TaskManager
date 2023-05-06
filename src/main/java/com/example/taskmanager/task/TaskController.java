@@ -1,12 +1,13 @@
 package com.example.taskmanager.task;
 
+import com.example.taskmanager.task.dtos.CreateTaskDTO;
+import com.example.taskmanager.task.dtos.responseDtos.CreateTaskResponseDTO;
+import com.example.taskmanager.task.dtos.updateTaskDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -20,18 +21,25 @@ public class TaskController {
     }
 
     @GetMapping("/all")
-    public List<Task> getAllTasks() {
-        return taskService.getTaskList();
+    public ResponseEntity<List<CreateTaskResponseDTO>> getAllTasks() {
+        List<CreateTaskResponseDTO> createTaskResponseDTOList = new ArrayList<>();
+        List<Task> taskList = taskService.getTaskList();
+        for (Task task : taskList) {
+            createTaskResponseDTOList.add(convertTaskToCreateTaskResponseDTO(task));
+        }
+        return ResponseEntity.ok(createTaskResponseDTOList);
     }
 
     @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable Integer id) {
-        return taskService.getTaskById(id);
+    public ResponseEntity<CreateTaskResponseDTO> getTaskById(@PathVariable Integer id) {
+        Task task = taskService.getTaskById(id);
+        return ResponseEntity.ok(convertTaskToCreateTaskResponseDTO(task));
     }
 
     @PostMapping("/new")
-    public Task createTask(@RequestBody Task task) {
-        return taskService.createTask(task.getName(), task.getDueDate());
+    public ResponseEntity<CreateTaskResponseDTO> createTask(@RequestBody CreateTaskDTO task){
+        Task task1 =  taskService.createTask(task.getName(), task.getDueDate());
+        return ResponseEntity.ok(convertTaskToCreateTaskResponseDTO(task1));
     }
 
     @DeleteMapping("/{id}")
@@ -41,13 +49,22 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Integer id, @RequestBody Task updates) {
-        return taskService.updateTask(id, updates);
+    public ResponseEntity<CreateTaskResponseDTO> updateTask(@PathVariable Integer id, @RequestBody Task updates) {
+        Task updatedTask =  taskService.updateTask(id, updates);
+        return ResponseEntity.ok(convertTaskToCreateTaskResponseDTO(updatedTask));
     }
 
-
     @PatchMapping("/{id}")
-    public Task patchTask(@PathVariable Integer id, @RequestBody Task updates){
-        return taskService.updateTask(id, updates);
+    public ResponseEntity<CreateTaskResponseDTO> patchTask(@PathVariable Integer id, @RequestBody updateTaskDTO updates){
+        Task updatedTask =  taskService.patchTask(id, updates.getCompleted(), updates.getDueDate());
+        return ResponseEntity.ok(convertTaskToCreateTaskResponseDTO(updatedTask));
+    }
+
+    public CreateTaskResponseDTO convertTaskToCreateTaskResponseDTO(Task task) {
+        CreateTaskResponseDTO createTaskResponseDTO = new CreateTaskResponseDTO();
+        createTaskResponseDTO.setName(task.getName());
+        createTaskResponseDTO.setDueDate(task.getDueDate());
+        createTaskResponseDTO.setCompleted(task.isCompleted());
+        return createTaskResponseDTO;
     }
 }

@@ -1,11 +1,10 @@
 package com.example.taskmanager.task.dtos;
 
+import java.util.Date;
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
-public class CreateTaskDTO {
-    private String name;
+public class updateTaskDTO {
+    private Boolean completed;
     private Date dueDate;
 }

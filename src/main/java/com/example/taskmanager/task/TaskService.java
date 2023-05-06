@@ -53,6 +53,22 @@ public class TaskService {
         return task;
     }
 
+    public Task patchTask(Integer id, Boolean completed, Date dueDate) {
+        Task task = getTaskById(id);
+        if (task == null) {
+            return null;
+        }
+
+        if (completed != null) {
+            task.setCompleted(completed);
+        }
+        if (dueDate != null) {
+            task.setDueDate(dueDate);
+        }
+
+        return task;
+    }
+
     public void deleteTask(Integer id) {
         Task task = getTaskById(id);
         if (task != null) {
